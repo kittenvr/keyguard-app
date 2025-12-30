@@ -544,6 +544,45 @@ sealed interface DFilter {
     }
 
     @Serializable
+    @SerialName("by_email")
+    data class ByEmail(
+        val email: String,
+    ) : PrimitiveSimple {
+        @Transient
+        override val key: String = "email|$email"
+
+        @Transient
+        override val content = PrimitiveSimple.Content(
+            title = if (email.isBlank()) TextHolder.Res(Res.string.email_filter_title) else TextHolder.Value(email),
+            icon = Icons.Outlined.Password,
+        )
+
+        override suspend fun prepare(
+            directDI: DirectDI,
+            ciphers: List<DSecret>,
+        ) = ::predicate
+
+        private fun predicate(
+            cipher: DSecret,
+        ): Boolean {
+            // If email is blank, this filter is not active
+            if (email.isBlank()) {
+                return false
+            }
+            
+            // Check login username (which might be an email)
+            if (cipher.login?.username?.equals(email, ignoreCase = true) == true) {
+                return true
+            }
+            // Check identity email
+            if (cipher.identity?.email?.equals(email, ignoreCase = true) == true) {
+                return true
+            }
+            return false
+        }
+    }
+
+    @Serializable
     @SerialName("by_pwd_value")
     data class ByPasswordValue(
         val value: String?,

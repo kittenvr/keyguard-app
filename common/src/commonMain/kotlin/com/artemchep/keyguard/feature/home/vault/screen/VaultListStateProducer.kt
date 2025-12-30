@@ -79,6 +79,7 @@ import com.artemchep.keyguard.feature.confirmation.ConfirmationResult
 import com.artemchep.keyguard.feature.confirmation.ConfirmationRoute
 import com.artemchep.keyguard.feature.decorator.ItemDecorator
 import com.artemchep.keyguard.feature.decorator.ItemDecoratorDate
+import com.artemchep.keyguard.feature.decorator.ItemDecoratorDomain
 import com.artemchep.keyguard.feature.decorator.ItemDecoratorNone
 import com.artemchep.keyguard.feature.decorator.ItemDecoratorTitle
 import com.artemchep.keyguard.feature.duplicates.list.createCipherSelectionFlow
@@ -97,6 +98,7 @@ import com.artemchep.keyguard.feature.home.vault.search.filter.FilterHolder
 import com.artemchep.keyguard.feature.home.vault.search.find
 import com.artemchep.keyguard.feature.home.vault.search.findAlike
 import com.artemchep.keyguard.feature.home.vault.search.sort.AlphabeticalSort
+import com.artemchep.keyguard.feature.home.vault.search.sort.DomainSort
 import com.artemchep.keyguard.feature.home.vault.search.sort.LastCreatedSort
 import com.artemchep.keyguard.feature.home.vault.search.sort.LastModifiedSort
 import com.artemchep.keyguard.feature.home.vault.search.sort.PasswordLastModifiedSort
@@ -1325,6 +1327,33 @@ fun vaultListScreenState(
                 ),
             ),
         ),
+        DomainSort to Fuu(
+            item = createComparatorAction(
+                id = "domain",
+                icon = Icons.Outlined.Password,
+                title = Res.string.sortby_domain_title,
+                config = ComparatorHolder(
+                    comparator = DomainSort,
+                ),
+            ),
+            subItems = listOf(
+                createComparatorAction(
+                    id = "domain_normal",
+                    title = Res.string.sortby_domain_normal_mode,
+                    config = ComparatorHolder(
+                        comparator = DomainSort,
+                    ),
+                ),
+                createComparatorAction(
+                    id = "domain_rev",
+                    title = Res.string.sortby_domain_reverse_mode,
+                    config = ComparatorHolder(
+                        comparator = DomainSort,
+                        reversed = true,
+                    ),
+                ),
+            ),
+        ),
     )
 
     val comparatorsListFlow = sortSink
@@ -2001,6 +2030,29 @@ private fun hahah(
                 )
 
             orderConfig?.comparator is PasswordStrengthSort -> PasswordStrengthDecorator()
+            orderConfig?.comparator is DomainSort -> ItemDecoratorDomain<VaultItem2, VaultItem2.Item>(
+                selector = { secret ->
+                    // Only extract domain from URIs
+                    secret.uris.firstOrNull { uri ->
+                        uri.uri.startsWith("http://", ignoreCase = true) ||
+                                uri.uri.startsWith("https://", ignoreCase = true)
+                    }?.let { uri ->
+                        try {
+                            // Extract domain from URL
+                            val url = java.net.URL(uri.uri)
+                            url.host.removePrefix("www.")
+                        } catch (e: Exception) {
+                            uri.uri
+                        }
+                    } ?: "[No Domain]"
+                },
+                factory = { id, text ->
+                    VaultItem2.Section(
+                        id = id,
+                        text = text,
+                    )
+                },
+            )
             else -> ItemDecoratorNone
         }
 

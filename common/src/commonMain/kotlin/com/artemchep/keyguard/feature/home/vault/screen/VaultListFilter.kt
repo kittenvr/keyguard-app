@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.FilterAlt
@@ -919,6 +920,42 @@ suspend fun <
         ),
     )
 
+    // Email filter section
+    val filterEmailListFlow = outputCipherFlow
+        .map { ciphers ->
+            // Extract all unique email addresses from ciphers
+            val emails = ciphers
+                .asSequence()
+                .flatMap { cipher ->
+                    sequence {
+                        // Add login usernames that look like emails
+                        cipher.login?.username?.takeIf { it.contains('@') }?.let { yield(it) }
+                        // Add identity emails
+                        cipher.identity?.email?.takeIf { it.isNotBlank() }?.let { yield(it) }
+                    }
+                }
+                .distinct()
+                .sorted()
+                .toList()
+            
+            emails.map { email ->
+                createFilterAction(
+                    sectionId = FilterSection.MISC.id,
+                    filter = setOf(
+                        DFilter.ByEmail(email = email),
+                    ),
+                    filterSectionId = "${FilterSection.MISC.id}.email.$email",
+                    title = email,
+                    icon = Icons.Outlined.Password,
+                )
+            }
+        }
+        .aaa(
+            sectionId = FilterSection.MISC.id,
+            sectionTitle = translate(Res.string.email_filter_title),
+        )
+        .filterSection(params.section.misc)
+
     val filterMiscListFlow = flowOf(Unit)
         .map {
             filterMiscAll
@@ -986,6 +1023,7 @@ suspend fun <
         filterFolderListFlow,
         filterCollectionListFlow,
         filterMiscListFlow,
+        filterEmailListFlow,
     ) { a -> a.flatMap { it } }
         .combine(collapsedSectionIdsSink) { items, collapsedSectionIds ->
             var skippedSectionId: String? = null

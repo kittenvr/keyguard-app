@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
@@ -46,6 +45,7 @@ import com.artemchep.keyguard.LocalAppMode
 import com.artemchep.keyguard.feature.home.vault.VaultRoute
 import com.artemchep.keyguard.feature.home.vault.component.AddAccountView
 import com.artemchep.keyguard.feature.home.vault.component.VaultListItem
+
 import com.artemchep.keyguard.feature.home.vault.model.FilterItem
 import com.artemchep.keyguard.feature.home.vault.model.VaultItem2
 import com.artemchep.keyguard.feature.localization.textResource
@@ -225,13 +225,17 @@ private fun VaultListFilterScreen(
     val filters = state.filters
     val clearFilters = state.clearFilters
     val saveFilters = state.saveFilters
-    FilterScreen(
-        modifier = modifier,
-        count = count,
-        items = filters,
-        onClear = clearFilters,
-        onSave = saveFilters,
-    )
+    
+    Column(modifier = modifier) {
+        // Regular filters
+        FilterScreen(
+            modifier = Modifier.fillMaxWidth(),
+            count = count,
+            items = filters,
+            onClear = clearFilters,
+            onSave = saveFilters,
+        )
+    }
 }
 
 @Composable

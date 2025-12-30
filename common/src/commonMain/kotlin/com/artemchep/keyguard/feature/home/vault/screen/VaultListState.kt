@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.emptyFlow
 data class VaultListState(
     val revision: Int = 0,
     val query: TextFieldModel2 = TextFieldModel2(mutableStateOf("")),
+
     val filters: List<FilterItem> = emptyList(),
     val sort: List<SortItem> = emptyList(),
     val saveFilters: (() -> Unit)? = null,

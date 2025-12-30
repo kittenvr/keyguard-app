@@ -18,6 +18,7 @@ interface Sort : PureSort, LeParcelable {
             PasswordSort.id -> PasswordSort
             PasswordLastModifiedSort.id -> PasswordLastModifiedSort
             PasswordStrengthSort.id -> PasswordStrengthSort
+            DomainSort.id -> DomainSort
             else -> null
         }
     }
