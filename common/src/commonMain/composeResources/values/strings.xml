@@ -890,6 +890,11 @@
     <string name="sortby_password_strength_title">Password strength</string>
     <string name="sortby_password_strength_normal_mode">Weakest First</string>
     <string name="sortby_password_strength_reverse_mode">Strongest First</string>
+    <string name="email_filter_title">Filter by Email</string>
+    <string name="email_filter_placeholder">Enter email address</string>
+    <string name="sortby_domain_title">Domain</string>
+    <string name="sortby_domain_normal_mode">Alphabetically</string>
+    <string name="sortby_domain_reverse_mode">Reverse Alphabetically</string>
 
     <string name="relative_time_just_now_short">now</string>
     <string name="relative_time_minute_short"><xliff:g id="minute" example="1">%1$s</xliff:g>m ago</string>
